@@ -1,0 +1,119 @@
+version: "3.3"
+services:     
+    FIWARE-Orion:
+        image: fiware/orion:latest
+        ports:
+            - 1026:1026
+        command: -dbhost mongo
+        links:
+            - mongo
+        restart: always
+        
+    designer:
+        image: fogflow/designer:latest
+        volumes:
+            - ./config.json:/app/config.json
+        ports:
+            - 8080:8080
+            - 1030:1030
+        depends_on: 
+            - discovery
+            - cloud_broker
+        restart: always
+            
+    discovery:
+        image: fogflow/discovery:latest
+        volumes:
+            - ./config.json:/config.json                        
+        ports:
+            - 8090:8090
+        restart: always
+
+    master:
+        image: fogflow/master:latest
+        volumes:
+            - ./config.json:/config.json                                   
+        links:
+            - rabbitmq        
+        ports:
+            - 1060:1060 
+            - 8010:8010 
+        depends_on: 
+            - rabbitmq
+            - discovery
+            - cloud_broker
+        restart: always 
+        
+    cloud_broker:
+        image: fogflow/broker:latest
+        volumes:
+            - ./config.json:/config.json 
+        ports:
+            - 8070:8070
+        depends_on: 
+            - discovery
+        restart: always     
+                                        
+    cloud_worker:
+        image: fogflow/worker:latest
+        volumes:
+            - /tmp:/tmp        
+            - ./config.json:/config.json                            
+            - /var/run/docker.sock:/var/run/docker.sock      
+        depends_on: 
+            - cloud_broker
+            - rabbitmq
+        restart: always
+                                        
+    rabbitmq:
+        image: rabbitmq:3.8
+        ports:
+            - 5672:5672
+        environment:
+            - RABBITMQ_DEFAULT_USER=admin
+            - RABBITMQ_DEFAULT_PASS=mypass   
+        restart: always
+
+    cygnus:
+        image: fiware/cygnus-ngsi:latest
+        ports:
+            - 5050:5050
+        environment:
+            - CYGNUS_SERVICE_PORT=5050
+            - CYGNUS_API_PORT=5051
+            - CYGNUS_LOG_LEVEL=DEBUG
+            - CYGNUS_MONGO_HOSTS=mongo
+            - CYGNUS_MONGO_PORT=27017
+            - CYGNUS_MONGO_USER=root
+            - CYGNUS_MONGO_PASS=root
+            - CYGNUS_MONGO_ENABLE_ENCODING=false
+            - CYGNUS_MONGO_ENABLE_GROUPING=false
+            - CYGNUS_MONGO_ENABLE_LOWERCASE=false
+            - CYGNUS_MONGO_ENABLE_NAME_MAPPINGS=false
+            - CYGNUS_MONGO_ENABLE_REPLACEMENT=false
+            - CYGNUS_MONGO_ENABLE_NAME_MAPPINGS=false
+            - CYGNUS_MONGO_ENABLE_REPLACEMENT=false
+            - CYGNUS_MONGO_ENABLE_LOWERCASE=false
+            - CYGNUS_MONGO_ENABLE_ENCODING=false
+            - CYGNUS_MONGO_ENABLE_LOWERCASE=false
+            - CYGNUS_MONGO_ENABLE_NAME_MAPPINGS=false
+            - CYGNUS_MONGO_ENABLE_REPLACEMENT=false
+            - CYGNUS_MONGO_ENABLE_LOWERCASE=false
+            - CYGNUS_MONGO_ENABLE_ENCODING=false
+            - CYGNUS_MONGO_ENABLE_LOWERCASE=false
+            - CYGNUS_MONGO_ENABLE_NAME_MAPPINGS=false
+            - CYGNUS_MONGO_ENABLE_REPLACEMENT=false
+            - CYGNUS_MONGO_ENABLE_LOWERCASE=false
+            - CYGNUS_MONGO_ENABLE_ENCODING=false
+            - CYGNUS_MONGO_ENABLE_LOWERCASE=false
+            - CYGNUS_MONGO_ENABLE_NAME_MAPPINGS=false
+            - CYGNUS_MONGO_ENABLE_REPLACEMENT=false
+            - CYGNUS_MONGO_ENABLE_LOWERCASE=false
+            - CYGNUS_MONGO_ENABLE_ENCODING=false
+            - CYGNUS_MONGO_ENABLE_LOWERCASE=false
+            - CYGNUS_MONGO_ENABLE_NAME_MAPPINGS=false
+            - CYGNUS_MONGO_ENABLE_REPLACEMENT=false
+            - CYGNUS_MONGO_ENABLE_LOWERCASE=false
+            - CYGNUS_MONGO_ENABLE_ENCODING=false
+            - CYGNUS_MONGO_ENABLE_LOWERCASE=false
+            - CYGNUS_MONGO_ENABLE_NAME_MAPPPINGS=false
